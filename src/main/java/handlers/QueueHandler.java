@@ -25,8 +25,8 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         final String requestId = (String) ctx.channel().attr(AttributeKey.valueOf("REQUESTID")).get();
         final String data = (String) msg;
 
-        System.out.println(data);
-
+        System.out.println("DATA: "+ data);
+        System.out.println("SERVICE: "+ service);
         initializeQueue();
 
         sendMessage(service, requestId, data);
