@@ -19,7 +19,6 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
     String requestId;
 
     private String parseToJson(final FullHttpRequest req) {
-        String result = "canary";
         JSONObject resultJson = new JSONObject();
 
         String type = req.method().toString();
@@ -96,9 +95,8 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
         ctx.channel().attr(AttributeKey.valueOf("SERVICE")).set(service);
         ctx.channel().attr(AttributeKey.valueOf("REQUESTID")).set(requestId);
-        //ctx.channel().attr(AttributeKey.newInstance("DATA")).set(data);
 
-        ctx.fireChannelRead(data); //maybe send json
+        ctx.fireChannelRead(data);
     }
 
     @Override
