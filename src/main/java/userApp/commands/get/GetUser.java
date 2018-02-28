@@ -9,9 +9,11 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 import userApp.model.User;
 
-public class GetUser implements Command {
+public class GetUser extends Command {
 
-    public void execute(HashMap<String, Object> props) {
+    public void execute() {
+        HashMap<String, Object> props = parameters;
+
         Channel channel = (Channel) props.get("channel");
         AMQP.BasicProperties properties = (AMQP.BasicProperties) props.get("properties");
         AMQP.BasicProperties replyProps = (AMQP.BasicProperties) props.get("replyProps");
