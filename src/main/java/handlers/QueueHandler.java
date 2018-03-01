@@ -37,7 +37,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 if(properties.getCorrelationId().equals(requestId)){
                     String data = new String(body, "UTF-8");
-
+                    System.out.println("Received: "+ data);
                     FullHttpResponse response = new DefaultFullHttpResponse(
                             HttpVersion.HTTP_1_1,
                             HttpResponseStatus.OK,
@@ -65,7 +65,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         try {
             //sharing connection between threads
             factory = new ConnectionFactory();
-            factory.setUri("amqp://rabbitmq:rabbitmq@172.17.0.1:5672");
+            factory.setHost("localhost");
             connection = factory.newConnection();
             mqChannel = connection.createChannel();
         } catch (Exception e) {
@@ -81,6 +81,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                     .correlationId(requestId)
                     .replyTo(service + "-response")
                     .build();
+            System.out.println("Sent: "+ message);
             mqChannel.basicPublish("", service + "-request", props, message.getBytes());
         } catch (Exception e) {
             e.printStackTrace();

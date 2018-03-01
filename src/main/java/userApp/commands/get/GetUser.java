@@ -18,7 +18,8 @@ public class GetUser extends Command {
         AMQP.BasicProperties properties = (AMQP.BasicProperties) props.get("properties");
         AMQP.BasicProperties replyProps = (AMQP.BasicProperties) props.get("replyProps");
         Envelope envelope = (Envelope) props.get("envelope");
-        String response = User.getUserById(1);
+//        String response = User.getUserById(1);
+        String response = (String)props.get("body");
         try {
             channel.basicPublish("", properties.getReplyTo(), replyProps, response.getBytes("UTF-8"));
             channel.basicAck(envelope.getDeliveryTag(), false);

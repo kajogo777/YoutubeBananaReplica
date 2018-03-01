@@ -58,7 +58,7 @@ public class UserService {
                         props.put("properties", properties);
                         props.put("replyProps", replyProps);
                         props.put("envelope", envelope);
-                        props.put("body", body);
+                        props.put("body", message);
 
                         cmd.init(props);
                         executor.submit(cmd);
@@ -75,13 +75,14 @@ public class UserService {
             channel.basicConsume(RPC_QUEUE_NAME, false, consumer);
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
-        } finally {
-            if (connection != null)
-                try {
-                    connection.close();
-                } catch (IOException _ignore) {
-                }
         }
+//        finally {
+//            if (connection != null)
+//                try {
+//                    connection.close();
+//                } catch (IOException _ignore) {
+//                }
+//        }
 
     }
 }
