@@ -95,6 +95,7 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
         requestId = UUID.randomUUID().toString();
 
         ctx.channel().attr(AttributeKey.valueOf("SERVICE")).set(service);
+        //correlational ID
         ctx.channel().attr(AttributeKey.valueOf("REQUESTID")).set(requestId);
         //ctx.channel().attr(AttributeKey.newInstance("DATA")).set(data);
 
