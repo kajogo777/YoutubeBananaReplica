@@ -11,22 +11,48 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 
 public class RequestHandler extends ChannelInboundHandlerAdapter {
 
     String requestId;
+    private static final HashMap<String, String> REQUEST_METHOD_COMMAND_PREFIX_MAP;
+    static
+    {
+        REQUEST_METHOD_COMMAND_PREFIX_MAP = new HashMap<String, String>();
+        REQUEST_METHOD_COMMAND_PREFIX_MAP.put("POST", "Create");
+        REQUEST_METHOD_COMMAND_PREFIX_MAP.put("GET", "Retrieve");
+        REQUEST_METHOD_COMMAND_PREFIX_MAP.put("PATCH", "Update");
+        REQUEST_METHOD_COMMAND_PREFIX_MAP.put("DELETE", "Delete");
+    }
 
     private String parseToJson(final FullHttpRequest req) {
         JSONObject resultJson = new JSONObject();
 
-        String type = req.method().toString();
+        String request_method = req.method().toString();
         String body = req.content().toString(CharsetUtil.UTF_8);
+        
         HashMap<String, String> params = uriDecode(req.uri());
 
+
+
         //TYPE
-        resultJson.put("type", type);
+        resultJson.put("request_method", request_method);
+        resultJson.put("uri", req.uri());
+        resultJson.put("command", parse_command(req));
+
+        //HEADERS
+        JSONObject headersJson = new JSONObject();
+        for (Iterator<Map.Entry<String, String>> headers_hash = req.headers().entries().iterator();
+             headers_hash.hasNext();) {
+            Map.Entry<String, String> item = headers_hash.next();
+            headersJson.put(item.getKey(), item.getValue());
+        }
+        resultJson.put("headers", headersJson);
+
 
         //BODY
         if(body != "") {
@@ -84,6 +110,23 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
         return result;
     }
 
+    private String getRequestEntity(final FullHttpRequest req){
+        String[] result = req.uri().split("/");
+
+        int entityIndex = 1;
+
+        if(result[entityIndex].contains("?")){
+            result[entityIndex] = result[entityIndex].substring(0, result[entityIndex].indexOf("?"));
+
+        }
+
+        String firstChar = result[entityIndex].substring(0, 1).toUpperCase();
+        result[entityIndex] = firstChar + result[entityIndex].substring(1, result.length + 1);
+
+        return result[entityIndex] ;
+    }
+
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
         final FullHttpRequest req = (FullHttpRequest) msg;
@@ -108,6 +151,12 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    private String parse_command(FullHttpRequest req) {
+        String command = REQUEST_METHOD_COMMAND_PREFIX_MAP.get(req.method().toString()) + getRequestEntity(req);
+
+        return command;
     }
 }
 

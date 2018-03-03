@@ -28,6 +28,8 @@ public class UserService {
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
+        factory.setUsername("rabbitmq");
+        factory.setPassword("rabbitmq");
         Connection connection = null;
         try {
             connection = factory.newConnection();
