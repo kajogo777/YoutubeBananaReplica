@@ -1,5 +1,8 @@
 package userApp.model;
 
+
+import org.json.simple.JSONObject;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -12,21 +15,22 @@ public class User {
         props.setProperty("user", "postgres");
         props.setProperty("password", "passw0rd");
         Connection conn = null;
-        String name = "";
+        JSONObject userObject = new JSONObject();
         try {
             conn = DriverManager.getConnection(url, props);
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM app_user WHERE id="+id);
             while (rs.next()) {
-                System.out.print("Column 1 returned ");
-                System.out.println(rs.getString(2));
-                name = rs.getString(2);
+                userObject.put("user_name",rs.getString(2));
+                userObject.put("email",rs.getString(3));
+                userObject.put("date_of_birth",rs.getString(5));
+                userObject.put("gender",rs.getString(6));
             }
             rs.close();
             st.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    return name;
+    return userObject.toString();
     }
 }
