@@ -1,6 +1,5 @@
 package userApp.commands.get;
 
-import javafx.beans.binding.IntegerBinding;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
