@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.AttributeKey;
-
+import videoService.Downloader;
 import java.util.UUID;
 
 
@@ -14,11 +14,10 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
     private String parseToJson(final FullHttpRequest req){
         String result = "canary";
-
-        System.out.println(req.uri());
-        System.out.println(req.method());
-        System.out.println(req.content());
-        System.out.println(req.headers());
+//        System.out.println(req.uri());
+//        System.out.println(req.method());
+//        System.out.println(req.content());
+//        System.out.println(req.headers());
 
 //        {
 //            "type": //CREATE or READ or UPDATE or DELETE],
@@ -48,6 +47,9 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
         ctx.channel().attr(AttributeKey.valueOf("SERVICE")).set(service);
         ctx.channel().attr(AttributeKey.valueOf("REQUESTID")).set(requestId);
         //ctx.channel().attr(AttributeKey.newInstance("DATA")).set(data);
+
+
+        Downloader downloader = new Downloader( req, ctx );
 
         ctx.fireChannelRead(data); //maybe send json
     }
