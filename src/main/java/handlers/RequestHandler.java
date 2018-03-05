@@ -17,7 +17,6 @@ import java.util.UUID;
 
 
 public class RequestHandler extends ChannelInboundHandlerAdapter {
-
     String requestId;
     private static final HashMap<String, String> REQUEST_METHOD_COMMAND_PREFIX_MAP;
     static
@@ -34,15 +33,13 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
         String request_method = req.method().toString();
         String body = req.content().toString(CharsetUtil.UTF_8);
-        
+
         HashMap<String, String> params = uriDecode(req.uri());
-
-
 
         //TYPE
         resultJson.put("request_method", request_method);
         resultJson.put("uri", req.uri());
-        resultJson.put("command", parse_command(req));
+        resultJson.put("command", parseCommand(req));
 
         //HEADERS
         JSONObject headersJson = new JSONObject();
@@ -111,19 +108,19 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
     }
 
     private String getRequestEntity(final FullHttpRequest req){
-        String[] result = req.uri().split("/");
+        String[] entities   = req.uri().split("/");
+        int mainEntityIndex = 1;
 
-        int entityIndex = 1;
-
-        if(result[entityIndex].contains("?")){
-            result[entityIndex] = result[entityIndex].substring(0, result[entityIndex].indexOf("?"));
-
+        if(entities[mainEntityIndex].contains("?")) {
+            entities[mainEntityIndex] =
+                entities[mainEntityIndex].substring(0, entities[mainEntityIndex].indexOf("?"));
         }
 
-        String firstChar = result[entityIndex].substring(0, 1).toUpperCase();
-        result[entityIndex] = firstChar + result[entityIndex].substring(1, result.length + 1);
+        String firstChar = entities[mainEntityIndex].substring(0, 1).toUpperCase();
+        entities[mainEntityIndex] =
+            firstChar + entities[mainEntityIndex].substring(1, entities.length + 1);
 
-        return result[entityIndex] ;
+        return entities[mainEntityIndex] ;
     }
 
 
@@ -153,11 +150,9 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    private String parse_command(FullHttpRequest req) {
-        String command = REQUEST_METHOD_COMMAND_PREFIX_MAP.get(req.method().toString()) + getRequestEntity(req);
-
+    private String parseCommand(FullHttpRequest req) {
+        String command =
+            REQUEST_METHOD_COMMAND_PREFIX_MAP.get(req.method().toString()) + getRequestEntity(req);
         return command;
     }
 }
-
-
