@@ -118,7 +118,7 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
         String firstChar = entities[mainEntityIndex].substring(0, 1).toUpperCase();
         entities[mainEntityIndex] =
-            firstChar + entities[mainEntityIndex].substring(1, entities.length + 1);
+            firstChar + entities[mainEntityIndex].substring(1, entities[mainEntityIndex].length());
 
         return entities[mainEntityIndex] ;
     }
