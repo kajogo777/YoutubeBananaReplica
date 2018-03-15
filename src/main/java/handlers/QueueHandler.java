@@ -66,8 +66,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
             //sharing connection between threads
             factory = new ConnectionFactory();
             factory.setHost("localhost");
-            factory.setUsername("rabbitmq");
-            factory.setPassword("rabbitmq");
+
             connection = factory.newConnection();
             mqChannel = connection.createChannel();
         } catch (Exception e) {
