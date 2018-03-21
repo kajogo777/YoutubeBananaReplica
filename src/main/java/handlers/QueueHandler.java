@@ -36,6 +36,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 if(properties.getCorrelationId().equals(requestId)){
+
                     String data = new String(body, "UTF-8");
                     System.out.println("Received: "+ data);
                     FullHttpResponse response = new DefaultFullHttpResponse(
@@ -45,6 +46,8 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                     );
                     response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
                     response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+
+                    this.getChannel().basicAck(envelope.getDeliveryTag(), false);
 
                     clientCtx.write(response);
                     clientCtx.flush();
@@ -56,9 +59,12 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                         e.printStackTrace();
                     }
                 }
+                else {
+                    this.getChannel().basicNack(envelope.getDeliveryTag(), false, true);
+                }
             }
         };
-        mqChannel.basicConsume(service + "-response", true, consumer);
+        mqChannel.basicConsume(service + "-response", false, consumer);
     }
 
     private void initializeQueue(){
@@ -66,8 +72,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
             //sharing connection between threads
             factory = new ConnectionFactory();
             factory.setHost("localhost");
-            factory.setUsername("rabbitmq");
-            factory.setPassword("rabbitmq");
+
             connection = factory.newConnection();
             mqChannel = connection.createChannel();
         } catch (Exception e) {

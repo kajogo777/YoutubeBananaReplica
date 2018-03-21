@@ -19,24 +19,31 @@ public class GetUser extends Command {
 
         Channel channel = (Channel) props.get("channel");
         JSONParser parser = new JSONParser();
-        int id = 0;
+        String time = "";
         try {
             JSONObject body = (JSONObject) parser.parse((String) props.get("body"));
             System.out.println(body.toString());
             JSONObject params = (JSONObject) parser.parse(body.get("parameters").toString());
-            id = Integer.parseInt(params.get("id").toString());
+            time = params.get("time").toString();
+            int timeInt = Integer.parseInt(time);
+            try {
+                Thread.sleep(timeInt);
+            } catch (InterruptedException _ignored) {
+                Thread.currentThread().interrupt();
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
         AMQP.BasicProperties properties = (AMQP.BasicProperties) props.get("properties");
         AMQP.BasicProperties replyProps = (AMQP.BasicProperties) props.get("replyProps");
         Envelope envelope = (Envelope) props.get("envelope");
-        String response = User.getUserById(id);
-//        String response = (String)props.get("body");
+//        String response = User.getUserById(id);
+        String response = (String)props.get("body");
         try {
             channel.basicPublish("", properties.getReplyTo(), replyProps, response.getBytes("UTF-8"));
             channel.basicAck(envelope.getDeliveryTag(), false);
         } catch (IOException e) {
+            System.out.println("there");
             e.printStackTrace();
         }
 

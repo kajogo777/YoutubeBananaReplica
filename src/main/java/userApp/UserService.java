@@ -28,8 +28,7 @@ public class UserService {
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        factory.setUsername("rabbitmq");
-        factory.setPassword("rabbitmq");
+
         Connection connection = null;
         try {
             connection = factory.newConnection();
@@ -37,13 +36,14 @@ public class UserService {
 
             channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
 
-            channel.basicQos(1);
+            channel.basicQos(4);
 
             System.out.println(" [x] Awaiting RPC requests");
 
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    System.out.println("New consumer running");
                     AMQP.BasicProperties replyProps = new AMQP.BasicProperties
                             .Builder()
                             .correlationId(properties.getCorrelationId())
@@ -64,6 +64,7 @@ public class UserService {
 
                         cmd.init(props);
                         executor.submit(cmd);
+
                     } catch (RuntimeException e) {
                         System.out.println(" [.] " + e.toString());
                     } finally {
