@@ -1,5 +1,6 @@
 import handlers.QueueHandler;
 import handlers.RequestHandler;
+import handlers.CacheHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -43,7 +44,7 @@ public class Server {
                     //p.addLast(new Dispatcher());
                     //p.addLast(e1, new CommandHandler());
                     p.addLast(new RequestHandler());
-                    //p.addLast(new CacheHandler());
+                    p.addLast(new CacheHandler());
                     p.addLast(new QueueHandler());
                 }
             });

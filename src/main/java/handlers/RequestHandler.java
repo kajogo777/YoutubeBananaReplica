@@ -135,6 +135,8 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
         ctx.channel().attr(AttributeKey.valueOf("SERVICE")).set(service);
         ctx.channel().attr(AttributeKey.valueOf("REQUESTID")).set(requestId);
+        ctx.channel().attr(AttributeKey.valueOf("PATH")).set(req.uri());
+        ctx.channel().attr(AttributeKey.valueOf("METHOD")).set(req.method().toString());
 
         ctx.fireChannelRead(data);
     }
