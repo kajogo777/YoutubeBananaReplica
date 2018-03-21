@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import io.netty.util.AttributeKey;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -23,10 +24,14 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
 
         final String service = (String) ctx.channel().attr(AttributeKey.valueOf("SERVICE")).get();
         final String requestId = (String) ctx.channel().attr(AttributeKey.valueOf("REQUESTID")).get();
+        final String path = (String) ctx.channel().attr(AttributeKey.valueOf("PATH")).get();
+        final String method = (String) ctx.channel().attr(AttributeKey.valueOf("METHOD")).get();
         final String data = (String) msg;
 
         System.out.println("DATA: "+ data);
         System.out.println("SERVICE: "+ service);
+        System.out.println("PATH: "+ path);
+
         initializeQueue();
 
         sendMessage(service, requestId, data);
@@ -38,6 +43,12 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                 if(properties.getCorrelationId().equals(requestId)){
 
                     String data = new String(body, "UTF-8");
+
+                    if(method == "GET") {
+                        Jedis jedis = new Jedis("localhost");
+                        jedis.set(path, data);
+                    }
+
                     System.out.println("Received: "+ data);
                     FullHttpResponse response = new DefaultFullHttpResponse(
                             HttpVersion.HTTP_1_1,
