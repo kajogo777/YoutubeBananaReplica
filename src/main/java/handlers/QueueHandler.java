@@ -82,7 +82,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         try {
             //sharing connection between threads
             factory = new ConnectionFactory();
-            factory.setHost("localhost");
+            factory.setHost("mq");
 
             connection = factory.newConnection();
             mqChannel = connection.createChannel();
