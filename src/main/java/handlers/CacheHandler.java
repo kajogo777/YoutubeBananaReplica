@@ -14,7 +14,7 @@ public class CacheHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         final String path = (String) ctx.channel().attr(AttributeKey.valueOf("PATH")).get();
         final String method = (String) ctx.channel().attr(AttributeKey.valueOf("METHOD")).get();
-        String host = System.getenv("REDIS");
+        String host = System.getenv("REDIS_SERVICE_HOST");
         Jedis jedis = new Jedis(host);
 
         String data = jedis.get(path);
