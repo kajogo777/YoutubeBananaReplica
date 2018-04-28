@@ -44,7 +44,7 @@ public class Server {
                     //p.addLast(new Dispatcher());
                     //p.addLast(e1, new CommandHandler());
                     p.addLast(new RequestHandler());
-                    p.addLast(new CacheHandler());
+//                    p.addLast(new CacheHandler());
                     p.addLast(new QueueHandler());
                 }
             });
