@@ -70,9 +70,6 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                         e.printStackTrace();
                     }
                 }
-                else {
-                    this.getChannel().basicNack(envelope.getDeliveryTag(), false, true);
-                }
             }
         };
         mqChannel.basicConsume(service + "-response", true, consumer);
