@@ -40,8 +40,9 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         Consumer consumer = new DefaultConsumer(mqChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                System.out.println("gali ay 5ara");
                 if(properties.getCorrelationId().equals(requestId)){
-
+                    System.out.println("da5al fel 5ara");
                     String data = new String(body, "UTF-8");
 
                     if(method == "GET") {
@@ -70,9 +71,12 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                         e.printStackTrace();
                     }
                 }
+                else {
+                    mqChannel.basicNack(envelope.getDeliveryTag(), false, true);
+                }
             }
         };
-        mqChannel.basicConsume(service + "-response", true, consumer);
+        mqChannel.basicConsume(service + "-response", false, consumer);
     }
 
     private void initializeQueue(){
