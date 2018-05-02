@@ -19,7 +19,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
     Channel mqChannel;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception{
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         final ChannelHandlerContext clientCtx = ctx;
 
         final String service = (String) ctx.channel().attr(AttributeKey.valueOf("SERVICE")).get();
@@ -28,9 +28,9 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         final String method = (String) ctx.channel().attr(AttributeKey.valueOf("METHOD")).get();
         final String data = (String) msg;
 
-        System.out.println("DATA: "+ data);
-        System.out.println("SERVICE: "+ service);
-        System.out.println("PATH: "+ path);
+        System.out.println("DATA: " + data);
+        System.out.println("SERVICE: " + service);
+        System.out.println("PATH: " + path);
 
         initializeQueue();
 
@@ -39,22 +39,21 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         mqChannel.queueDeclare(service + "-response", false, false, false, null);
         Consumer consumer = new DefaultConsumer(mqChannel) {
             @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                if(properties.getCorrelationId().equals(requestId)){
-
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
+                    byte[] body) throws IOException {
+                System.out.println("gali ay 5ara");
+                if (properties.getCorrelationId().equals(requestId)) {
+                    System.out.println("da5al fel 5ara");
                     String data = new String(body, "UTF-8");
 
-                    if(method == "GET") {
+                    if (method == "GET") {
                         Jedis jedis = new Jedis("localhost");
                         jedis.set(path, data);
                     }
 
-                    System.out.println("Received: "+ data);
-                    FullHttpResponse response = new DefaultFullHttpResponse(
-                            HttpVersion.HTTP_1_1,
-                            HttpResponseStatus.OK,
-                            copiedBuffer(data.getBytes())
-                    );
+                    System.out.println("Received: " + data);
+                    FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
+                            copiedBuffer(data.getBytes()));
                     response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
                     response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
@@ -69,15 +68,17 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                     } catch (TimeoutException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    mqChannel.basicNack(envelope.getDeliveryTag(), false, true);
                 }
             }
         };
         mqChannel.basicConsume(service + "-response", true, consumer);
     }
 
-    private void initializeQueue(){
+    private void initializeQueue() {
         try {
-            //sharing connection between threads
+            // sharing connection between threads
             factory = new ConnectionFactory();
             String host = System.getenv("RABBIT_MQ_SERVICE_HOST");
             factory.setHost(host);
@@ -89,15 +90,12 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void sendMessage(String service, String requestId, String message){
+    private void sendMessage(String service, String requestId, String message) {
         try {
             mqChannel.queueDeclare(service + "-request", false, false, false, null);
-            AMQP.BasicProperties props = new AMQP.BasicProperties
-                    .Builder()
-                    .correlationId(requestId)
-                    .replyTo(service + "-response")
-                    .build();
-            System.out.println("Sent: "+ message);
+            AMQP.BasicProperties props = new AMQP.BasicProperties.Builder().correlationId(requestId)
+                    .replyTo(service + "-response").build();
+            System.out.println("Sent: " + message);
             mqChannel.basicPublish("", service + "-request", props, message.getBytes());
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +103,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception{
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
     }
 
