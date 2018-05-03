@@ -46,10 +46,10 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                     System.out.println("da5al fel 5ara");
                     String data = new String(body, "UTF-8");
 
-                    if (method == "GET") {
-                        Jedis jedis = new Jedis("localhost");
-                        jedis.set(path, data);
-                    }
+//                    if (method == "GET") {
+//                        Jedis jedis = new Jedis("localhost");
+//                        jedis.set(path, data);
+//                    }
 
                     System.out.println("Received: " + data);
                     FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
