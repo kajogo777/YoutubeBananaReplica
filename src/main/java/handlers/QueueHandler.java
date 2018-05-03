@@ -73,7 +73,7 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                 }
             }
         };
-        mqChannel.basicConsume(service + "-response", true, consumer);
+        mqChannel.basicConsume(service + "-response", false, consumer);
     }
 
     private void initializeQueue() {
