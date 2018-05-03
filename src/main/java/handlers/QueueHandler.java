@@ -57,10 +57,10 @@ public class QueueHandler extends ChannelInboundHandlerAdapter {
                     response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
                     response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
 
-                    this.getChannel().basicAck(envelope.getDeliveryTag(), false);
-
+                    System.out.println("RESPONSE: "+response);
                     clientCtx.write(response);
                     clientCtx.flush();
+                    this.getChannel().basicAck(envelope.getDeliveryTag(), false);
 
                     try {
                         this.getChannel().close();
